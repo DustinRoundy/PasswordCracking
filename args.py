@@ -22,7 +22,7 @@ rank = 0
 cluster_size = 1
 start_number = rank
 
-alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","d","E","F","G","H","I","J","K","L","M","N","O","P","q","R","S","T","U","V","W","X","Y","Z","0","1","2","3","4","5","6","7","8","9"]
 alphabet_length = len(alphabet)
 
 def _decompose2(number):
@@ -86,7 +86,7 @@ def password_crack(thread_number, q):
     curr_attempt = threaded_start
     # f = open('E:/report.txt', 'w')
     while True:
-        if (attempts % 100000) == 0:
+        if (attempts % 1000000) == 0:
             if thread_number == 0:
                 print(base_10_to_alphabet2(curr_attempt))
             elif thread_number == 1:
