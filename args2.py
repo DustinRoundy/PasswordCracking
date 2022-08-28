@@ -1,6 +1,7 @@
 import argparse
 from audioop import mul
 from multiprocessing.dummy import current_process
+from colorama import Fore
 import threading
 import multiprocessing
 import time
@@ -11,7 +12,7 @@ parser = argparse.ArgumentParser(description='Password testing software')
 parser.add_argument('password', metavar='N', type=str, help='The password you want to try and crack')
 parser.add_argument('-m', '--min', default=1, type=int, help='The minimum amount of characters in the password')
 parser.add_argument('-t', '--threads', type=int, choices=range(1,9), default=1 ,help='The maximum amount of threads you want to use')
-parser.add_argument('-a', '--alphabet', action="store_true" help='Which alphabet do you want to check against.')
+parser.add_argument('-u', '--upper', action="store_true", help='Which alphabet do you want to check against.')
 
 args = parser.parse_args()
 
@@ -91,13 +92,13 @@ def password_crack(thread_number, q, f, queue):
             if q.is_set():
                 break
             if thread_number == 0:
-                print(base_10_to_alphabet2(curr_attempt))
+                print(Fore.WHITE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
             elif thread_number == 1:
-                print("\t" + base_10_to_alphabet2(curr_attempt))
+                print(Fore.RED, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
             elif thread_number == 2:
-                print("\t\t" + base_10_to_alphabet2(curr_attempt))
+                print(Fore.GREEN, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
             elif thread_number == 3:
-                print("\t\t\t" + base_10_to_alphabet2(curr_attempt))
+                print(Fore.BLUE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
         if curr_attempt == encoded_password:
             print("Node ", rank+1, " Thread ", thread_number, " found the password")
             break
