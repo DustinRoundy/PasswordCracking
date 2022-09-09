@@ -1,13 +1,13 @@
-# from mpi4py import MPI
+from mpi4py import MPI
 import time
 import sys
 # from test import base_arr_to_10, base_10_to_alphabet2
-# comm = MPI.COMM_WORLD
-# rank = comm.Get_rank()
-# cluster_size = comm.Get_size()
-rank = 0
-cluster_size = 1
-start_number = rank
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+cluster_size = comm.Get_size()
+# rank = 0
+# cluster_size = 1
+# start_number = rank
 
 alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 alphabet_length = len(alphabet)
@@ -48,8 +48,8 @@ def base_arr_to_10(letters):
 password = sys.argv[1]
 # passmin = sys.argv.get(2)
 # passmax = sys.argv.get(3)
-print(passmin)
-print(passmax)
+# print(passmin)
+# print(passmax)
 encoded_password = base_arr_to_10(password)
 
 start = time.time()

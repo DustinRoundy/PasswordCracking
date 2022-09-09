@@ -1,12 +1,15 @@
 import settings
+import time
+
+# alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+# alphabet_length = len(alphabet)
 
 def _decompose2(number, alphabet):
     """Generate digits from `number` in base alphabet, most significants
     bits first.
     """
-
-    # number -= 1  # Account for A in base alphabet being 1 in decimal rather than 0
     alphabet_length = len(alphabet)
+    # number -= 1  # Account for A in base alphabet being 1 in decimal rather than 0
     if number < alphabet_length:
         yield number
     else:
@@ -34,6 +37,27 @@ def base_arr_to_10(letters, alphabet):
 
     return letters_num
 
+
+# password = args.password
+# # passmin = sys.argv.get(2)
+# # passmax = sys.argv.get(3)
+# # print(passmin)
+# # print(passmax)
+# encoded_password = base_arr_to_10(password)
+
+# start = time.time()
+
+
+
+# results = comm.gather(attempts, root=0)
+
+# print(encoded_password, curr_attempt)
+# if rank == 0:
+#     end = round(time.time() - start, 2)
+#     print("Found password in ", attempts, " attempts")
+#     print("Nodes: ", str(cluster_size))
+#     print('Time elapsed: ' + str(end) + ' seconds')
+
 def password_crack(thread_number, q, f, rank, encoded_password, alphabet):
     # print(current_process().pid)
     attempts = 0
@@ -46,7 +70,7 @@ def password_crack(thread_number, q, f, rank, encoded_password, alphabet):
             if q.is_set():
                 break
             if thread_number == 0:
-                print(base_10_to_alphabet2(curr_attempt, alphabet))
+                print(curr_attempt)
             #     print(Fore.WHITE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
             # elif thread_number == 1:
             #     print(Fore.RED, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
@@ -66,10 +90,10 @@ def password_crack(thread_number, q, f, rank, encoded_password, alphabet):
             curr_attempt += settings.NODES * settings.THREADS
             attempts += 1
     print(encoded_password, curr_attempt)
-    # if rank == 0:
-    #     end = round(time.time() - start, 2)
-    #     # print("Node ", thread_number, " made ", attempts, " attempts")
-    #     # print("Nodes + Threads: ", str(cluster_size), " + ", str(args.threads))
-    #     print('Time elapsed: ' + str(end) + ' seconds')
-    #     # q.put('Found')
-    #     f.set()
+    if rank == 0:
+        # end = round(time.time() - start, 2)
+        # # print("Node ", thread_number, " made ", attempts, " attempts")
+        # # print("Nodes + Threads: ", str(cluster_size), " + ", str(args.threads))
+        # print('Time elapsed: ' + str(end) + ' seconds')
+        # q.put('Found')
+        f.set()

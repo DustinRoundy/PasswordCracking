@@ -73,3 +73,17 @@ class Loader:
     # for i in range(10):
     #     sleep(0.25)
     # loader.stop()
+
+class progress:
+    def __init__(self, max):
+        self.max = max
+        self.end = False
+        self.amount = "*"
+
+    def update(self, value): 
+        # 30/45 × 100
+        percentage = round((value / self.max) * 100, 2)
+        # █████░░░░░
+        # print(percentage)
+        print(f"\r{percentage}", flush=True, end="")
+        # sleep(self.timeout)

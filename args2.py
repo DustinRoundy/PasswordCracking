@@ -12,7 +12,9 @@ parser = argparse.ArgumentParser(description='Password testing software')
 parser.add_argument('password', metavar='N', type=str, help='The password you want to try and crack')
 parser.add_argument('-m', '--min', default=1, type=int, help='The minimum amount of characters in the password')
 parser.add_argument('-t', '--threads', type=int, choices=range(1,9), default=1 ,help='The maximum amount of threads you want to use')
-parser.add_argument('-u', '--upper', action="store_true", help='Which alphabet do you want to check against.')
+# parser.add_argument('-u', '--upper', action="store_true", help='Allow Uppercased Letters')
+# parser.add_argument('-n', '--numbers', action='store_true', help='Allow Numbers')
+# parser.add_argument('-s', '--symbols', action='store_true', help='Allow Symbols to be used')
 
 args = parser.parse_args()
 
@@ -88,7 +90,7 @@ def password_crack(thread_number, q, f, queue):
     curr_attempt = threaded_start
     # f = open('E:/report.txt', 'w')
     while True:
-        if (attempts % 1000000) == 0:
+        if (attempts % 100000) == 0:
             if q.is_set():
                 break
             if thread_number == 0:
