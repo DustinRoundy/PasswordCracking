@@ -84,6 +84,13 @@ class progress:
         # 30/45 × 100
         percentage = round((value / self.max) * 100, 2)
         # █████░░░░░
+        per_bar = ""
+        for i in range(0,int(round((int(percentage)/2), 0))):
+            
+            per_bar = per_bar + "█"
+        for x in range(0, (50 - int(round((int(percentage)/2), 0)))):
+            per_bar = per_bar + "░"
         # print(percentage)
-        print(f"\r{percentage}", flush=True, end="")
+        output = per_bar + " " + str(percentage) + "% " + str(value) + " guesses attempted"
+        print(f"\r{output}", flush=True, end="")
         # sleep(self.timeout)

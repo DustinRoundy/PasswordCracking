@@ -1,17 +1,18 @@
-from ast import Load
+# from ast import Load
+# from concurrent.futures import thread
 import platform, os
 import getpass
 
-from numpy import true_divide
-from loader import Loader
+# from numpy import true_divide
+from loader import Loader, progress
 from time import sleep, time
 import settings
-import functions
+# import functions
 import multiprocessing
 import menu
 from colorama import Fore
-import queue
-import threading
+# import queue
+# import threading
 
 if settings.USE_MPI:
     from mpi4py import MPI
@@ -65,12 +66,20 @@ def clear_console():
     else:
         os.system("clear")
 
-def print_worker(queues, event):
+def print_worker(queues, event, progress):
+    # i = 0
     while True:
+        # i += 
+        value = []
         if event.is_set():
             break
-        for q in queues:
-            print(q.get())
+        # for q in queues:
+            # print(q.get())
+            # value.append(q.get())
+        # print(value)
+        progress.update(queues[0].get())
+
+        sleep(0.20)
 
 def _decompose2(number, alphabet):
     """Generate digits from `number` in base alphabet, most significants
@@ -104,16 +113,7 @@ def base_arr_to_10(letters, alphabet):
 
     return letters_num
 
-def password_crack(thread_number, q, f, password):
-    symbols = ["!","@","#","$","%","?"]
-    alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
-    if any(map(str.isupper, password)) or settings.FORCE_CAPITALS:
-        alphabet = alphabet + ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-    if any(map(str.isdigit,password)):
-        alphabet = alphabet + ["1","2","3","4","5","6","7","8","9","0"]
-    if any([char in password for char in symbols]):
-        alphabet = alphabet + ["!","@","#","$","%","?"]
-    encoded_password = base_arr_to_10(password, alphabet)
+def password_crack(thread_number, q, f, encoded_password, alphabet):
     # print(current_process().pid)
     start = time()
     attempts = 0
@@ -122,9 +122,10 @@ def password_crack(thread_number, q, f, password):
     curr_attempt = threaded_start
     # f = open('E:/report.txt', 'w')
     while True:
-        if (attempts % 10000) == 0:
+        if (attempts % 100000) == 0:
             if q.is_set():
                 break
+            # pipe.put(curr_attempt)
             # p.put([thread_number, base_10_to_alphabet2(curr_attempt)])
             if thread_number == 0:
                 print(Fore.WHITE, base_10_to_alphabet2(curr_attempt, alphabet), Fore.WHITE)
@@ -150,7 +151,8 @@ def password_crack(thread_number, q, f, password):
         end = round(time() - start, 2)
         # print("Node ", thread_number, " made ", attempts, " attempts")
         # print("Nodes + Threads: ", str(cluster_size), " + ", str(args.threads))
-        print('Time elapsed: ' + str(end) + ' seconds')
+        if thread_number == 0:
+            print('Time elapsed: ' + str(end) + ' seconds')
         # q.put('Found')
         f.set()
 
@@ -162,70 +164,91 @@ def all_true(iterable):
 
 
 if __name__ == '__main__':
-    clear_console()
-    while True:
-        try:
-            print(menu.title_screen)
-            print(menu.open_screen)
-            password = getpass.getpass("Please enter a password to try and crack:")
-            # print(alphabet.update(password))
-            # print(alphabet)
+    if rank == 0:
+        clear_console()
+        while True:
+            try:
+                print(menu.title_screen)
+                print(menu.open_screen)
+                password = input("Please enter a password to try and crack:")
+                # print(alphabet.update(password))
+                # print(alphabet)
 
-            # encoded_password = base_arr_to_10(password)
-            start = time()
-            
-            # with Loader("Checking password:" , "Password: ✔"):
-                # sleep(5)
-            q = multiprocessing.Queue()
-            quit = multiprocessing.Event()
-            found = multiprocessing.Event()
-            threads = []
-            pipes = []
-            for i in range(0, settings.THREADS):
-                # pipe = multiprocessing.Queue()
-                # child.close()
-                p = multiprocessing.Process(target=password_crack, args=(i,quit,found, password))
-                threads.append(p)
-                # pipes.append(pipe)
-                p.start()
-                # p.join()
-            # while not found.wait():
-            #     print(pipes)
-            #     for p in pipes:
-            #         # if not p.empty():
-            #         print(p.get())
-            # while True:
-            #     if found.is_set():
-            #         print("found")
-            #         break
-            #     else:
-            #         print("not found")
+                symbols = ["!","@","#","$","%","?"]
+                alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+                if any(map(str.isupper, password)) or settings.FORCE_CAPITALS:
+                    alphabet = alphabet + ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+                if any(map(str.isdigit,password)):
+                    alphabet = alphabet + ["1","2","3","4","5","6","7","8","9","0"]
+                if any([char in password for char in symbols]):
+                    alphabet = alphabet + ["!","@","#","$","%","?"]
+                # encoded_password = base_arr_to_10(password, alphabet)
 
-            # c = threading.Thread(target=print_worker,args=(pipes, found), daemon=True)
-            # c.start()
-            # c.join()
-            found.wait()
+                encoded_password = base_arr_to_10(password, alphabet)
+                start = time()
 
-            # while found:
-            #     for q in pipes:
-            #         if not q.empty():
-            #             print(q.get())
+                if settings.USE_MPI:
+                    data = {"alphabet": alphabet, "password": encoded_password}
+                    request = comm.bcast(data, root=0)
+                    print(request)
 
-            quit.set()
-            loader = Loader("Waiting for threads to clean up", "All threads closed").start()
-            while all_true(threads):
-                #do nothing
-                sleep(0.5)
-                pass
-            loader.stop()
+                # with Loader("Checking password:" , "Password: ✔"):
+                    # sleep(5)
+                q = multiprocessing.Queue()
+                quit = multiprocessing.Event()
+                found = multiprocessing.Event()
+                threads = []
+                pipes = []
+                for i in range(0, settings.THREADS):
+                    # pipe = multiprocessing.Queue()
+                    # child.close()
+                    p = multiprocessing.Process(target=password_crack, args=(i,quit,found, encoded_password, alphabet))
+                    threads.append(p)
+                    # pipes.append(pipe)
+                    p.start()
+                    # p.join()
+                # while not found.wait():
+                #     print(pipes)
+                #     for p in pipes:
+                #         # if not p.empty():
+                #         print(p.get())
+                # while True:
+                #     if found.is_set():
+                #         print("found")
+                #         break
+                #     else:
+                #         print("not found")
 
-            # for i in range (0,15):
+                prog = progress(encoded_password)
+                # c = threading.Thread(target=print_worker,args=(pipes, found, prog), daemon=True)
+                # c.start()
+                # c.join()
+                found.wait()
 
-            #     sleep(1)
+                # while found:
+                #     for q in pipes:
+                #         if not q.empty():
+                #             print(q.get())
 
-            input("please press enter")
-            clear_console()
-        except KeyboardInterrupt:
-            print('Interrupted')
-            clear_console()
-            break
+                quit.set()
+                loader = Loader("Waiting for threads to clean up", "All threads closed").start()
+                while all_true(threads):
+                    #do nothing
+                    sleep(0.5)
+                    pass
+                loader.stop()
+
+                # for i in range (0,15):
+
+                #     sleep(1)
+
+                input("please press enter")
+                clear_console()
+            except KeyboardInterrupt:
+                print('Interrupted')
+                clear_console()
+                break
+    else:
+        data = None
+        request = comm.bcast(data,root=0)
+        print("received request")
