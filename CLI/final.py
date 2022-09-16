@@ -1,10 +1,10 @@
 import argparse
 import multiprocessing
-from sre_constants import SRE_FLAG_VERBOSE
+# from sre_constants import SRE_FLAG_VERBOSE
 import time
 import socket
 import json
-from loader import Loader
+# from loader import Loader
 
 parser = argparse.ArgumentParser(description='Password testing software')
 parser.add_argument('password', metavar='N', type=str, help='The password you want to try and crack')
@@ -134,21 +134,22 @@ class Progress:
     def connect(self):
         self.SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.SOCKET1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        loader = Loader("Attempting to connect to server", "Connected!").start()
+        # loader = Loader("Attempting to connect to server", "Connected!").start()
         try:
-            # print("attempting to connect to server") #connect to 1.242 and 1.243
+            print("attempting to connect to server") #connect to 1.242 and 1.243
             self.SOCKET.settimeout(5)
             self.SOCKET1.settimeout(5)
             self.SOCKET.connect((self.HOST[0], self.PORT))
             self.SOCKET1.connect((self.HOST[0], self.PORT))
             self.CONNECTED = True
-            # print("connected")
-            loader.stop()
+            print("connected")
+            # loader.stop()
             # self.SOCKET.sendall(str.encode(json.dumps({"data":"1234"})))
             # self.SOCKET = s
         except:
-            loader.update("Failed to Connect")
-            loader.stop()
+            print("failed to connect")
+            # loader.update("Failed to Connect")
+            # loader.stop()
 
     def update(self, status):
         if self.CONNECTED:
