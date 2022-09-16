@@ -3,6 +3,7 @@ import time
 import sys
 import json
 import socket
+from colorama import Fore
 # from test import base_arr_to_10, base_10_to_alphabet2
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -64,7 +65,8 @@ class Progress:
         self.SOCKET1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # loader = Loader("Attempting to connect to server", "Connected!").start()
         try:
-            print("attempting to connect to server") #connect to 1.242 and 1.243
+            if rank == 0:
+                print("attempting to connect to server") #connect to 1.242 and 1.243
             self.SOCKET.settimeout(5)
             self.SOCKET1.settimeout(5)
             self.SOCKET.connect((self.HOST[0], self.PORT))
@@ -75,7 +77,8 @@ class Progress:
             # self.SOCKET.sendall(str.encode(json.dumps({"data":"1234"})))
             # self.SOCKET = s
         except:
-            print("failed to connect")
+            if rank == 0:
+                print("failed to connect")
             # loader.update("Failed to Connect")
             # loader.stop()
 
@@ -114,8 +117,9 @@ encoded_password = base_arr_to_10(password)
 start = time.time()
 
 attempts = 0
-progress = Progress(encoded_password, None)
-progress.update(0)
+if rank == 0:
+    progress = Progress(encoded_password, None)
+    progress.update(0)
 
 
 # for attempt in range(start_number, end_number, cluster_size * 2):
@@ -129,8 +133,18 @@ while True:
         print("node falied to find password")
         break
     else:
-        if rank == 0:
-            progress.update(curr_attempt)
+        if (attempts % 1000000) == 0:
+            if rank == 0:
+                progress.update(curr_attempt)
+        if (attempts % 100000) == 0:
+            if rank == 0:
+                print(Fore.WHITE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif rank == 1:
+                print(Fore.RED, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif rank == 2:
+                print(Fore.GREEN, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif rank == 3:
+                print(Fore.BLUE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
         # print("guess: ", curr_attempt)
         # f.write("Guess: " + base_10_to_alphabet2(curr_attempt) +'\n')
         curr_attempt += cluster_size

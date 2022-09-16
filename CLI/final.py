@@ -4,6 +4,7 @@ import multiprocessing
 import time
 import socket
 import json
+from colorama import Fore
 # from loader import Loader
 
 parser = argparse.ArgumentParser(description='Password testing software')
@@ -86,14 +87,14 @@ def password_crack(thread_number, q, f, encoded_password, alphabet, progress):
             if q.is_set():
                 break
             progress.update(curr_attempt)
-            # if thread_number == 0:
-            #     print(Fore.WHITE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
-            # elif thread_number == 1:
-            #     print(Fore.RED, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
-            # elif thread_number == 2:
-            #     print(Fore.GREEN, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
-            # elif thread_number == 3:
-            #     print(Fore.BLUE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            if thread_number == 0:
+                print(Fore.WHITE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif thread_number == 1:
+                print(Fore.RED, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif thread_number == 2:
+                print(Fore.GREEN, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
+            elif thread_number == 3:
+                print(Fore.BLUE, base_10_to_alphabet2(curr_attempt), Fore.WHITE)
         if curr_attempt == encoded_password:
             print("Thread ", thread_number, " found the password")
             progress.complete()
