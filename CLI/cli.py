@@ -1,5 +1,6 @@
 # from ast import Load
 # from concurrent.futures import thread
+from logging import root
 import platform, os
 import getpass
 
@@ -19,6 +20,7 @@ if settings.USE_MPI:
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     cluster_size = comm.Get_size()
+    # inicomm = MPI.Comm.Get_parent()
 else:
     rank = 0
     cluster_size = 1
@@ -125,6 +127,15 @@ def password_crack(thread_number, q, f, encoded_password, alphabet):
         if (attempts % 100000) == 0:
             if q.is_set():
                 break
+            data = None
+            inicomm = comm.bcast(data,root=1)
+            print(inicomm)
+            try:
+                if inicomm.get("exit"):
+                    print("thread found password")
+                    break
+            except:
+                pass
             # pipe.put(curr_attempt)
             # p.put([thread_number, base_10_to_alphabet2(curr_attempt)])
             if thread_number == 0:
@@ -137,6 +148,7 @@ def password_crack(thread_number, q, f, encoded_password, alphabet):
                 print(Fore.BLUE, base_10_to_alphabet2(curr_attempt, alphabet), Fore.WHITE)
         if curr_attempt == encoded_password:
             print("Node ", rank+1, " Thread ", thread_number, " found the password")
+            exitcast = comm.bcast({"exit": True}, root=1)
             break
         # elif curr_attempt > encoded_password:
         #     print("node falied to find password")
@@ -243,6 +255,7 @@ if __name__ == '__main__':
                 #     sleep(1)
 
                 input("please press enter")
+                exitcom = comm.bcast(None, root=1)
                 clear_console()
             except KeyboardInterrupt:
                 print('Interrupted')
@@ -252,3 +265,25 @@ if __name__ == '__main__':
         data = None
         request = comm.bcast(data,root=0)
         print("received request")
+        q = multiprocessing.Queue()
+        quit = multiprocessing.Event()
+        found = multiprocessing.Event()
+        threads = []
+        pipes = []
+        for i in range(0, settings.THREADS):
+            # pipe = multiprocessing.Queue()
+            # child.close()
+            p = multiprocessing.Process(target=password_crack, args=(i,quit,found, request.get("password"), request.get("alphabet")))
+            threads.append(p)
+            # pipes.append(pipe)
+            p.start()
+        found.wait()
+
+        # found_bcast = comm.ibcast({"exit":True}, root=0)
+
+                # while found:
+                #     for q in pipes:
+                #         if not q.empty():
+                #             print(q.get())
+
+        quit.set()

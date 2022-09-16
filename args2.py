@@ -5,6 +5,7 @@ from colorama import Fore
 import threading
 import multiprocessing
 import time
+# from mpi4py import MPI
 # password = ''
 # minimum = 0
 # threads = 0
@@ -25,6 +26,9 @@ args = parser.parse_args()
 rank = 0
 cluster_size = 1
 start_number = rank
+# comm = MPI.COMM_WORLD
+# rank = comm.Get_rank()
+# cluster_size = comm.Get_size()
 
 alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 alphabet_length = len(alphabet)
@@ -151,8 +155,8 @@ if __name__ == '__main__':
         # threads.append(p)
         # p.join()
     found.wait()
-
     quit.set()
+    # comm.Disconnect()
 
     # while True:
     #     if q.get() == "Found":

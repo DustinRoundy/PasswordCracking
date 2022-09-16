@@ -7,7 +7,7 @@ rank = comm.Get_rank()
 cluster_size = comm.Get_size()
 # rank = 0
 # cluster_size = 1
-# start_number = rank
+start_number = rank
 
 alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 alphabet_length = len(alphabet)
@@ -64,7 +64,7 @@ while True:
     if curr_attempt == encoded_password:
         break
     elif curr_attempt > encoded_password:
-        print("node falied to find password")
+        print("node failed to find password")
         break
     else:
         # print("guess: ", curr_attempt)
