@@ -113,13 +113,13 @@ password = sys.argv[1]
 # print(passmin)
 # print(passmax)
 encoded_password = base_arr_to_10(password)
+socket_frequency = (encoded_password / 100)
 
 start = time.time()
 
 attempts = 0
-if rank == 0:
-    progress = Progress(encoded_password, None)
-    progress.update(0)
+progress = Progress(encoded_password, None)
+progress.update(0)
 
 
 # for attempt in range(start_number, end_number, cluster_size * 2):
@@ -131,9 +131,10 @@ while True:
         break
     elif curr_attempt > encoded_password:
         print("node falied to find password")
+        progress.close()
         break
     else:
-        if (attempts % 1000000) == 0:
+        if (attempts % socket_frequency) == 0:
             if rank == 0:
                 progress.update(curr_attempt)
         if (attempts % 100000) == 0:
