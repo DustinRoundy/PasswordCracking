@@ -86,15 +86,13 @@ class Progress:
         if self.CONNECTED:
             percentage = int(round((status / self.MAX) * 100, 0))
             if percentage <= 99:
-                if percentage > self.percent:
-                    if percentage != self.percent:
-                        self.SOCKET.sendall(str.encode(json.dumps({"id":self.id,"data": percentage})))
-                        self.SOCKET1.sendall(str.encode(json.dumps({"id":self.id,"data": percentage})))
-                        self.percent = percentage
+                self.SOCKET.sendall(str.encode(json.dumps({"id":self.id,"data":percentage})))
+                self.SOCKET1.sendall(str.encode(json.dumps({"id":self.id,"data":percentage})))
+                self.percent = percentage
             # if percentage == 100:
             #     if self.FOUND.is_set():
             #         self.SOCKET.sendall(str.encode(json.dumps({"data": "complete"})))
-    
+
     def close(self):
         if self.CONNECTED:
             self.SOCKET.close()
@@ -113,13 +111,13 @@ password = sys.argv[1]
 # print(passmin)
 # print(passmax)
 encoded_password = base_arr_to_10(password)
-socket_frequency = (encoded_password / 100)
+socket_frequency = 100000
 
 start = time.time()
 
 attempts = 0
-progress = Progress(encoded_password, None)
-progress.update(0)
+if rank == 0:
+    progress = Progress(encoded_password, None)
 
 
 # for attempt in range(start_number, end_number, cluster_size * 2):
@@ -127,11 +125,11 @@ curr_attempt = start_number
 # f = open('E:/report.txt', 'w')
 while True:
     if curr_attempt == encoded_password:
-        progress.complete()
+        #progress.complete()
         break
     elif curr_attempt > encoded_password:
-        print("node falied to find password")
-        progress.close()
+        print("node failed to find password")
+        #progress.close()
         break
     else:
         if (attempts % socket_frequency) == 0:
@@ -155,6 +153,7 @@ while True:
 
 # print(encoded_password, curr_attempt)
 if rank == 0:
+    progress.complete()
     end = round(time.time() - start, 2)
     print("Found password in ", attempts, " attempts")
     print("Nodes: ", str(cluster_size))

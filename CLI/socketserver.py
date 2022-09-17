@@ -2,10 +2,12 @@ import socket
 import threading
 import time
 import json
+import os
 
-# def update_led(strand, status):
+def update_led(strand, status):
+    os.system("echo "+str(status)+" > ~/signals/"+strand+".txt")
 #     if strand == "windows":
-#         if status == "complete": # 
+#         if status == "complete": #
             # Call function or put code to update the strand pattern/status
         # else:
             # Call function or put code to update strands progress bar
@@ -18,11 +20,12 @@ def handle(conn_addr, addr):
         while True:
             data = conn.recv(1024)
             if not data:
+                print("No data")
                 break
             # conn.sendall(data)
-            # print(json.loads(data))
+            print(json.loads(data))
             data_dict = json.loads(data) # returns data in the following format: {'id': 'Windows', 'data': 97}
-            # update_led(data_dict.get('id'), data_dict.get('data'))
+            update_led(data_dict.get('id'), data_dict.get('data'))
 
 
 
